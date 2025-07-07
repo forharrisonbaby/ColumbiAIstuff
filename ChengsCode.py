@@ -42,7 +42,7 @@ def drawBoard(screen, state, step, start_time, is_solution=False, solution_num=N
     if is_solution:
         caption = f"Solution #{solution_num} Time: {round(time.time()-start_time, 2)}"
     else:
-        caption = f"N-Queens BFS - Step {step} Time: {round(time.time()-start_time, 2)}"
+        caption = f"N-Queens DFS - Step {step} Time: {round(time.time()-start_time, 2)}"
     pygame.display.set_caption(caption)
 
     # Optional: show text on screen
@@ -93,5 +93,49 @@ def bfsNQueensPygame():
             pygame.quit()
             sys.exit()
 
+def dfsNQueensPygame():
+    pygame.init()
+    screen = pygame.display.set_mode((CELL_SIZE * N, CELL_SIZE * N))
+    clock = pygame.time.Clock()
+    font = pygame.font.SysFont(None, 36)
+
+    stack = []  # DFS uses a stack
+    stack.append([])  # start with empty state
+    step = 0
+    solution_count = 0
+
+    global start_time 
+    start_time = time.time()
+    while stack:
+        # Handle events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        state = stack.pop()  # DFS: use pop from end
+        row = len(state)
+
+        if row == N:
+            solution_count += 1
+            drawBoard(screen, state, step, start_time, is_solution=True, solution_num=solution_count)
+            continue
+
+        drawBoard(screen, state, step, start_time)
+        step += 1
+
+        # Generate children in reverse to maintain left-to-right DFS order
+        for col in reversed(range(N)):
+            if isSafe(state, row, col):
+                stack.append(state + [col])  # push onto stack
+
+    # Show final message before quitting
+    pygame.display.set_caption(f"Done! {solution_count} solutions found.")
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
 # Run
-bfsNQueensPygame()
+dfsNQueensPygame()
